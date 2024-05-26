@@ -36,6 +36,15 @@ type TDeleteBoardAction = {
     boardId: string;
 }
 
+type TSortAction = {
+    boardIndex: number;
+    droppableIdStart: string;
+    droppableIdEnd: string;
+    droppableIndexStart: number;
+    droppableIndexEnd: number;
+    draggableId: string;
+}
+
 const initialState : TBoardState = {
     modalActive: false,
     boardArray: [
@@ -161,9 +170,35 @@ const boardSlice = createSlice({
         },
         setModalActive: (state, {payload}: PayloadAction<boolean>) => {
             state.modalActive = payload
+        },
+
+        sort: (state, {payload}: PayloadAction<TSortAction> ) => {
+            // same list
+            if (payload.droppableIdStart === payload.droppableIdEnd) {
+                const list = state.boardArray[payload.boardIndex].lists.find(
+                    list => list.listId === payload.droppableIdStart
+                )
+
+                // 변경시키는 아이템을 배열에서 지워줍니다.
+                // return 값으로 지워진 아이템을 잡아줍니다.
+                const card = list?.tasks.splice(payload.droppableIndexStart, 1);
+                list?.tasks.splice(payload.droppableIndexEnd, 0, ...card!);
+            }
+
+            if (payload.droppableIdStart !== payload.droppableIdEnd) {
+                const listStart = state.boardArray[payload.boardIndex].lists.find(
+                    list => list.listId === payload.droppableIdStart
+                )
+
+                const card = listStart!.tasks.splice(payload.droppableIndexStart, 1);
+                const listEnd = state.boardArray[payload.boardIndex].lists.find(
+                    list => list.listId === payload.droppableIdEnd
+                )
+                listEnd?.tasks.splice(payload.droppableIndexEnd, 0, ...card);
+            }
         }
     }
 })
 
-export const {addBoard, deleteList, deleteTask, updateTask, setModalActive, addTask, addList, deleteBoard} = boardSlice.actions;
+export const {sort, addBoard, deleteList, deleteTask, updateTask, setModalActive, addTask, addList, deleteBoard} = boardSlice.actions;
 export const boardsReducer = boardSlice.reducer;

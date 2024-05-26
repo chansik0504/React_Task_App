@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { GrSubtract } from 'react-icons/gr'
 import ActionButton from '../ActionButton/ActionButton'
 import Task from '../Task/Task'
